@@ -132,13 +132,13 @@ int main(int argc, char* argv[]) {
 	teapotPosition.Set(0.0, 0.0, 5.0);
 
 
-	teapotModelToWorldMatrix.SetRotationX(2.0); 
-	teapotModelToWorldMatrix2.SetRotationY(90.0*(180 / 3.14));
+	teapotModelToWorldMatrix.SetRotationX(-2.0); 
+	//teapotModelToWorldMatrix2.SetRotationZ(90.0*(180 / 3.14));
 	teapotWorldToCameraMatrix.SetTrans(teapotPosition);
 	cameraToScreenMatrix.SetPerspective(1.0, 1.0, 1.0, 200.0);
 	teapotWorldToCameraMatrix.Invert();
 
-	cy::Matrix4f mvp = cameraToScreenMatrix * teapotWorldToCameraMatrix * teapotModelToWorldMatrix * teapotModelToWorldMatrix2;
+	cy::Matrix4f mvp = cameraToScreenMatrix * teapotWorldToCameraMatrix * teapotModelToWorldMatrix;// * teapotModelToWorldMatrix2;
 
 
 	testLocation = glGetUniformLocation(t_program.GetID(), "mvp");

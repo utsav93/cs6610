@@ -9,5 +9,5 @@ uniform mat4 mvp;
 void main()
 {
 	gl_Position = mvp * vec4((0.05*vertPosModel), 1.0);
-	v_color = vec4(1.0, 1.0, 0.0, 1.0);
+	v_color = vec4(0.0, 1.0, 0.0, 1.0);
 }
