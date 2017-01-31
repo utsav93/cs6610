@@ -1,3 +1,4 @@
 ﻿  Main.cpp
-  Project2_Utsav.vcxproj -> D:\cs6610\Debug\Project2_Utsav.exe
-  Project2_Utsav.vcxproj -> D:\cs6610\Debug\Project2_Utsav.pdb (Partial PDB)
+c:\users\u1011486\desktop\cs6610\project2_utsav\main.cpp(136): warning C4305: 'argument': truncation from 'double' to 'float'
+  Project2_Utsav.vcxproj -> C:\Users\u1011486\Desktop\cs6610\Debug\Project2_Utsav.exe
+  Project2_Utsav.vcxproj -> C:\Users\u1011486\Desktop\cs6610\Debug\Project2_Utsav.pdb (Partial PDB)

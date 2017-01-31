@@ -18,6 +18,7 @@ cy::GLSLShader fragShader;
 GLuint testLocation;
 
 cy::Matrix4f teapotModelToWorldMatrix;
+cy::Matrix4f teapotModelToWorldMatrix2;
 cy::Matrix4f teapotWorldToCameraMatrix;
 cy::Matrix4f cameraToScreenMatrix;
 
@@ -43,17 +44,23 @@ void keyPressed(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
+void installShaders()
+{
+	vertShader.CompileFile("vertShader.glsl", GL_VERTEX_SHADER);
+	fragShader.CompileFile("fragShader.glsl", GL_FRAGMENT_SHADER);
+	t_program.AttachShader(vertShader);
+	t_program.AttachShader(fragShader);
+	t_program.Link();
+	t_program.Bind();
+
+}
+
 void keyPressedSpecial(int key, int x, int y)
 {
 	if (key == GLUT_KEY_F6)
 	{
 		t_program.CreateProgram();
-		vertShader.CompileFile("vertShader.glsl", GL_VERTEX_SHADER);
-		fragShader.CompileFile("fragShader.glsl", GL_FRAGMENT_SHADER);
-		t_program.AttachShader(vertShader);
-		t_program.AttachShader(fragShader);
-		t_program.Link();
-		t_program.Bind();
+		installShaders();
 		glutPostRedisplay();
 	}
 }
@@ -66,6 +73,7 @@ void mouseEvents(int button, int state, int x, int y)
 		//gluLookAt(0.0, 0.0, 0.0, 5.0, 5.0, 5.0, 0.0, 1.0, 0.0);
 	}
 }
+
 
 
 int main(int argc, char* argv[]) {
@@ -114,28 +122,23 @@ int main(int argc, char* argv[]) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cy::Point3f), 0);
 
+	
 	t_program.CreateProgram();
-	vertShader.CompileFile("vertShader.glsl", GL_VERTEX_SHADER);
+	installShaders();
 
-	fragShader.CompileFile("fragShader.glsl", GL_FRAGMENT_SHADER);
-
-	t_program.AttachShader(vertShader);
-	t_program.AttachShader(fragShader);
-
-	t_program.Link();
-
-	t_program.Bind();
+	//glutIdleFunc(idle);
 
 	cy::Point3f teapotPosition;
 	teapotPosition.Set(0.0, 0.0, 5.0);
 
 
-	teapotModelToWorldMatrix.SetRotationX(2.0);
+	teapotModelToWorldMatrix.SetRotationX(2.0); 
+	teapotModelToWorldMatrix2.SetRotationY(90.0*(180 / 3.14));
 	teapotWorldToCameraMatrix.SetTrans(teapotPosition);
 	cameraToScreenMatrix.SetPerspective(1.0, 1.0, 1.0, 200.0);
 	teapotWorldToCameraMatrix.Invert();
 
-	cy::Matrix4f mvp = cameraToScreenMatrix * teapotWorldToCameraMatrix * teapotModelToWorldMatrix;
+	cy::Matrix4f mvp = cameraToScreenMatrix * teapotWorldToCameraMatrix * teapotModelToWorldMatrix * teapotModelToWorldMatrix2;
 
 
 	testLocation = glGetUniformLocation(t_program.GetID(), "mvp");
@@ -150,6 +153,7 @@ int main(int argc, char* argv[]) {
 
 	glutKeyboardFunc(keyPressed);
 	glutSpecialFunc(keyPressedSpecial);
+	
 	glutPostRedisplay();
 
 
