@@ -15,6 +15,14 @@ cy::GLSLProgram t_program;
 cy::GLSLShader vertShader;
 cy::GLSLShader fragShader;
 
+GLuint testLocation;
+
+cy::Matrix4f teapotModelToWorldMatrix;
+cy::Matrix4f teapotWorldToCameraMatrix;
+cy::Matrix4f cameraToScreenMatrix;
+
+static bool t_Button1Down = false;
+static bool t_Button2Down = false;
 
 
 void render()
@@ -31,6 +39,32 @@ void keyPressed(unsigned char key, int x, int y)
 	//ASCII value for escape key
 	if (key == 27)
 		exit(0);
+
+	glutPostRedisplay();
+}
+
+void keyPressedSpecial(int key, int x, int y)
+{
+	if (key == GLUT_KEY_F6)
+	{
+		t_program.CreateProgram();
+		vertShader.CompileFile("vertShader.glsl", GL_VERTEX_SHADER);
+		fragShader.CompileFile("fragShader.glsl", GL_FRAGMENT_SHADER);
+		t_program.AttachShader(vertShader);
+		t_program.AttachShader(fragShader);
+		t_program.Link();
+		t_program.Bind();
+		glutPostRedisplay();
+	}
+}
+
+void mouseEvents(int button, int state, int x, int y)
+{
+	if (button == GLUT_LEFT_BUTTON)
+	{
+		t_Button1Down = (state == GLUT_DOWN) ? TRUE : FALSE;
+		//gluLookAt(0.0, 0.0, 0.0, 5.0, 5.0, 5.0, 0.0, 1.0, 0.0);
+	}
 }
 
 
@@ -95,11 +129,8 @@ int main(int argc, char* argv[]) {
 	cy::Point3f teapotPosition;
 	teapotPosition.Set(0.0, 0.0, 5.0);
 
-	cy::Matrix4f teapotModelToWorldMatrix;
-	cy::Matrix4f teapotWorldToCameraMatrix;
-	cy::Matrix4f cameraToScreenMatrix;
+
 	teapotModelToWorldMatrix.SetRotationX(2.0);
-	//teapotMatrix.SetRotationY(1.0);
 	teapotWorldToCameraMatrix.SetTrans(teapotPosition);
 	cameraToScreenMatrix.SetPerspective(1.0, 1.0, 1.0, 200.0);
 	teapotWorldToCameraMatrix.Invert();
@@ -107,17 +138,18 @@ int main(int argc, char* argv[]) {
 	cy::Matrix4f mvp = cameraToScreenMatrix * teapotWorldToCameraMatrix * teapotModelToWorldMatrix;
 
 
-	GLuint testLocation = glGetUniformLocation(t_program.GetID(), "mvp");
+	testLocation = glGetUniformLocation(t_program.GetID(), "mvp");
 	glUniformMatrix4fv(testLocation, 1, GL_FALSE, mvp.data);
 
-
+	//gluLookAt(0.0, 0.0, 0.0, 5.0, 5.0, 5.0, 0.0, 1.0, 0.0);
 	glutDisplayFunc(render);
 
 	//comment for no animation
 	//glutTimerFunc(2, callBack, 1);
-
+	glutMouseFunc(mouseEvents);
 
 	glutKeyboardFunc(keyPressed);
+	glutSpecialFunc(keyPressedSpecial);
 	glutPostRedisplay();
 
 
