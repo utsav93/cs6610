@@ -30,7 +30,7 @@ void render()
 {
 	//glClearColor(0.0, 1.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDrawArrays(GL_POINTS, 0, static_cast<GLsizei> (numVerts));
+	glDrawArrays(GL_LINES, 0, static_cast<GLsizei> (numVerts));
 	glutSwapBuffers();
 }
 
@@ -108,6 +108,7 @@ int main(int argc, char* argv[]) {
 
 	t_vertices = &(teapot.V(0));
 	numVerts = teapot.NV();
+	t_normals = &(teapot.NF(0));
 
 	GLuint teapotVertArray;
 	GLuint vertBufferObj;
@@ -115,9 +116,9 @@ int main(int argc, char* argv[]) {
 	glBindVertexArray(teapotVertArray);
 
 	glGenBuffers(1, &vertBufferObj);
-	glBindBuffer(GL_ARRAY_BUFFER,vertBufferObj);
+	glBindBuffer(GL_ARRAY_BUFFER, vertBufferObj);
 
-	glBufferData(GL_ARRAY_BUFFER, numVerts * sizeof(cy::Point3f), t_vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, numVerts * sizeof(cy::Point3f), t_vertices, GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cy::Point3f), 0);
