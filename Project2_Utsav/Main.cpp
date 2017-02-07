@@ -2,37 +2,48 @@
 #include <GL\gl.h>
 #include <GL\GLU.h>
 #include <GL\freeglut.h>
+#include <glm\glm.hpp>
+#include <glm\gtx\transform.hpp>
 #include <iostream>
-#include <cyTriMesh.h>	
-#include <cyPoint.h>
 #include <cyGL.h>
-#include <cyMatrix.h>
+#include <ShapeGenerator.h>
+#include <Camera.h>
 
-cy::Point3f *t_vertices;
-unsigned int numVerts;
-unsigned int numNormals;
-cy::Point3f *t_normals;
+using namespace glm;
+
+
 
 cy::GLSLProgram t_program;
 cy::GLSLShader vertShader;
 cy::GLSLShader fragShader;
 
+GLuint teapotNumIndices;
+GLuint teapotIndexByteOffset;
+
 GLuint testLocation;
 
-cy::Matrix4f teapotModelToWorldMatrix;
-cy::Matrix4f teapotModelToWorldMatrix2;
-cy::Matrix4f teapotWorldToCameraMatrix;
-cy::Matrix4f cameraToScreenMatrix;
+mat4 teapotModelToWorldMatrix;
+mat4 teapotModelToWorldMatrix2;
+mat4 teapotWorldToCameraMatrix;
+mat4 cameraToScreenMatrix;
+
+Camera camera;
 
 static bool t_Button1Down = false;
 static bool t_Button2Down = false;
+
+mat4 modelToProjectionMatrix;
+mat4 viewToProjectionMatrix = glm::perspective(60.0f, ((float)1200) / 800, 0.1f, 20.0f);
+mat4 worldToViewMatrix = camera.getWorldToViewMatrix();
+mat4 worldToProjectionMatrix = viewToProjectionMatrix * worldToViewMatrix;
 
 
 void render()
 {
 	//glClearColor(0.0, 1.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei> (numVerts));
+	//glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei> (numVerts));
+	glDrawElements(GL_TRIANGLES, teapotNumIndices, GL_UNSIGNED_SHORT, (void*)teapotIndexByteOffset);
 	glutSwapBuffers();
 }
 
@@ -80,59 +91,38 @@ void mouseEvents(int button, int state, int x, int y)
 
 int main(int argc, char* argv[]) {
 
-	cy::TriMesh teapot;
-	char fileName[50];
-	std::cout << "Enter name of obj file, include .obj in the filename: (Entire absolute system path or relative path as set by IDE)" << std::endl;
-	std::cin >> fileName;
-	bool hasMat = false;
-	char isMat = 'A';
-	std::cout << "Does the mesh have material? Y/N?" << std::endl;
-	std::cin >> isMat;
-	switch (isMat)
-	{
-	case 'Y': hasMat = true;
-		break;
-	case 'y': hasMat = true;
-		break;
-	case 'n': hasMat = false;
-		break;
-	case 'N': hasMat = false;
-		break;
-	default: std::cout << "Wrong input" << std::endl;
-		break;
-	}
-	teapot.LoadFromFileObj(fileName, hasMat);
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(1200, 800);
 	glutCreateWindow("Hello OpenGL World");
 	glewInit();
 
-	t_vertices = &(teapot.V(0));
-	numVerts = teapot.NV();
-	teapot.ComputeNormals();
-	t_normals = &(teapot.VN(0));
-	numNormals = teapot.NVN();
+
 	GLuint teapotVertArray;
 	GLuint vertBufferObj;
 	GLuint normBufferObj;
 	glGenVertexArrays(1, &teapotVertArray);
 	glBindVertexArray(teapotVertArray);
 
+	ShapeData teapot = ShapeGenerator::makeTeapot();
+	teapotNumIndices = teapot.numIndices;
+	teapotIndexByteOffset += teapot.vertexBufferSize();
+
 	glGenBuffers(1, &vertBufferObj);
 	glBindBuffer(GL_ARRAY_BUFFER, vertBufferObj);
 
-	glBufferData(GL_ARRAY_BUFFER, numVerts * sizeof(cy::Point3f), t_vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, teapot.vertexBufferSize() + teapot.indexBufferSize() , 0, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &normBufferObj);
-	glBindBuffer(GL_ARRAY_BUFFER, normBufferObj);
-
-	glBufferSubData(GL_ARRAY_BUFFER, normBufferObj, numNormals * sizeof(cy::Point3f), t_normals);
+	GLsizeiptr currentOffset = 0;
+	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, teapot.vertexBufferSize(), teapot.vertices);
+	currentOffset += teapot.vertexBufferSize();
+	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, teapot.indexBufferSize(), teapot.indices);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cy::Point3f), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), 0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cy::Point3f), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)sizeof(vec3));
 
 	
 	t_program.CreateProgram();
@@ -140,8 +130,7 @@ int main(int argc, char* argv[]) {
 
 	//glutIdleFunc(idle);
 
-	cy::Point3f teapotPosition;
-	teapotPosition.Set(0.0, 0.0, 5.0);
+	vec3 teapotTranslation(3.0f, 0.0f, 0.0f);
 
 
 	teapotModelToWorldMatrix.SetRotationX(-2.0); 
@@ -150,7 +139,7 @@ int main(int argc, char* argv[]) {
 	cameraToScreenMatrix.SetPerspective(1.0, 1.0, 1.0, 200.0);
 	teapotWorldToCameraMatrix.Invert();
 
-	cy::Matrix4f mvp = cameraToScreenMatrix * teapotWorldToCameraMatrix * teapotModelToWorldMatrix;// * teapotModelToWorldMatrix2;
+	mat4 mvp = cameraToScreenMatrix * teapotWorldToCameraMatrix * teapotModelToWorldMatrix;// * teapotModelToWorldMatrix2;
 
 
 	testLocation = glGetUniformLocation(t_program.GetID(), "mvp");
