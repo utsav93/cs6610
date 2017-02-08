@@ -120,7 +120,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="..\Camera.cpp" />
+    <ClCompile Include="..\ShapeGenerator.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -135,6 +136,10 @@
     <ClInclude Include="..\cyMatrix.h" />
     <ClInclude Include="..\cyPoint.h" />
     <ClInclude Include="..\cyTriMesh.h" />
+    <ClInclude Include="..\shapedata.h" />
+    <ClInclude Include="..\ShapeGenerator.h" />
+    <ClInclude Include="..\TeapotData.h" />
+    <ClInclude Include="..\Vertex.h" />
     <ClInclude Include="Camera.h" />
   </ItemGroup>
   <ItemGroup>

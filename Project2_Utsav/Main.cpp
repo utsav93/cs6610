@@ -20,19 +20,29 @@ cy::GLSLShader fragShader;
 GLuint teapotNumIndices;
 GLuint teapotIndexByteOffset;
 
-GLuint testLocation;
+glm::vec3 diffuseLightPosition(0.0f, 0.5f, 0.0f);
+GLfloat lightPositionWorldChange = 0.2f;
+
+GLfloat teapotRotation = 60.0f;
+vec3 teapotTranslation(3.0f, 0.0f, 0.0f);
 
 mat4 teapotModelToWorldMatrix;
 mat4 teapotModelToWorldMatrix2;
 mat4 teapotWorldToCameraMatrix;
 mat4 cameraToScreenMatrix;
+mat4 modelToProjectionMatrix;
+
+GLuint modelToProjectionUniformLocation;
+GLint lightPositionWorldUniformLocation;
+GLint ambientLightUniformLocation;
+GLint modelToWorldMatrixUniformLocation;
+GLint cameraPositionUniformLocation;
 
 Camera camera;
 
 static bool t_Button1Down = false;
 static bool t_Button2Down = false;
 
-mat4 modelToProjectionMatrix;
 mat4 viewToProjectionMatrix = glm::perspective(60.0f, ((float)1200) / 800, 0.1f, 20.0f);
 mat4 worldToViewMatrix = camera.getWorldToViewMatrix();
 mat4 worldToProjectionMatrix = viewToProjectionMatrix * worldToViewMatrix;
@@ -98,10 +108,8 @@ int main(int argc, char* argv[]) {
 	glutCreateWindow("Hello OpenGL World");
 	glewInit();
 
-
 	GLuint teapotVertArray;
 	GLuint vertBufferObj;
-	GLuint normBufferObj;
 	glGenVertexArrays(1, &teapotVertArray);
 	glBindVertexArray(teapotVertArray);
 
@@ -124,26 +132,37 @@ int main(int argc, char* argv[]) {
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)sizeof(vec3));
 
-	
+
 	t_program.CreateProgram();
 	installShaders();
 
+
+	worldToProjectionMatrix = viewToProjectionMatrix * worldToViewMatrix;
+	viewToProjectionMatrix = glm::perspective(60.0f, ((float)1200) / 800, 0.1f, 200.0f);
+	worldToViewMatrix = camera.getWorldToViewMatrix();
+
+	modelToWorldMatrixUniformLocation = glGetUniformLocation(t_program.GetID(), "modelToWorldMatrix");
+	modelToProjectionUniformLocation = glGetUniformLocation(t_program.GetID(), "modelToProjectionMatrix");
+	lightPositionWorldUniformLocation = glGetUniformLocation(t_program.GetID(), "lightPositionWorld");
+	ambientLightUniformLocation = glGetUniformLocation(t_program.GetID(), "ambientLight");
+	cameraPositionUniformLocation = glGetUniformLocation(t_program.GetID(), "cameraPositionWorld");
+
+	glm::mat4 teapotModelToWorldMatrix = glm::translate(teapotTranslation) * glm::rotate(teapotRotation, 0.0f, 1.0f, 0.0f) * glm::rotate(-90.0f, 1.0f, 0.0f, 0.0f) * glm::scale(0.5f, 0.5f, 0.5f);
+	modelToProjectionMatrix = worldToProjectionMatrix * teapotModelToWorldMatrix;
+	glUniformMatrix4fv(modelToProjectionUniformLocation, 1, GL_FALSE, &modelToProjectionMatrix[0][0]);
+	glUniformMatrix4fv(modelToWorldMatrixUniformLocation, 1, GL_FALSE, &teapotModelToWorldMatrix[0][0]);
+
+	glm::vec3 ambientLight(0.2f, 0.2f, 0.2f);
+	glUniform3fv(ambientLightUniformLocation, 1, &ambientLight[0]);
+	lightPositionWorldUniformLocation = glGetUniformLocation(t_program.GetID(), "lightPositionWorld");
+	glm::vec3 lightPositionWorld(diffuseLightPosition);
+	glUniform3fv(lightPositionWorldUniformLocation, 1, &lightPositionWorld[0]);
+
+	
+
+
 	//glutIdleFunc(idle);
 
-	vec3 teapotTranslation(3.0f, 0.0f, 0.0f);
-
-
-	teapotModelToWorldMatrix.SetRotationX(-2.0); 
-	//teapotModelToWorldMatrix2.SetRotationZ(90.0*(180 / 3.14));
-	teapotWorldToCameraMatrix.SetTrans(teapotPosition);
-	cameraToScreenMatrix.SetPerspective(1.0, 1.0, 1.0, 200.0);
-	teapotWorldToCameraMatrix.Invert();
-
-	mat4 mvp = cameraToScreenMatrix * teapotWorldToCameraMatrix * teapotModelToWorldMatrix;// * teapotModelToWorldMatrix2;
-
-
-	testLocation = glGetUniformLocation(t_program.GetID(), "mvp");
-	glUniformMatrix4fv(testLocation, 1, GL_FALSE, mvp.data);
 
 	//gluLookAt(0.0, 0.0, 0.0, 5.0, 5.0, 5.0, 0.0, 1.0, 0.0);
 	glutDisplayFunc(render);

@@ -1,16 +1,19 @@
+#pragma warning(disable:4146)
 #include <ShapeGenerator.h>
-#include <glm.hpp>
-#include <gtc\matrix_transform.hpp>
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
 #include <Vertex.h>
 #include <ShapeData.h>
 #include <fstream>
-#include <Qt\qdebug.h>
+#include <vector>
+#include <climits>
 #define PI 3.14159265359
 using glm::vec2;
 using glm::vec3;
 using glm::mat4;
 using glm::mat3;
 #define NUM_ARRAY_ELEMENTS(a) sizeof(a) / sizeof(*a)
+
 
 namespace {
 	struct VertexWithoutTangent {
@@ -988,8 +991,8 @@ ShapeData ShapeGenerator::generateNormals(const ShapeData& data)
 ShapeData loadBinarizedObjFile(const char* filename)
 {
 	std::ifstream in(filename, std::ios::binary | std::ios::in);
-	if (!in.good())
-		qDebug() << "Can't locate binary file: " << filename;
+	//if (!in.good())
+	//	qDebug() << "Can't locate binary file: " << filename;
 
 	ShapeData ret;
 
@@ -1008,7 +1011,7 @@ ShapeData loadBinarizedObjFile(const char* filename)
 	size_t vertexByteSize = sizeof(VertexPNUT) * (*numVertsPtr);
 
 	VertexPNUT* verts = reinterpret_cast<VertexPNUT*>(buf + fileHeaderSize);
-	ushort* indices = reinterpret_cast<ushort*>(buf + fileHeaderSize + vertexByteSize);
+	GLushort* indices = reinterpret_cast<GLushort*>(buf + fileHeaderSize + vertexByteSize);
 
 
 	ret.vertices = new Vertex[*numVertsPtr];

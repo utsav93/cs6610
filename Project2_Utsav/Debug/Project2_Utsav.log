@@ -1,3 +1,20 @@
-﻿  Main.cpp
+﻿  ShapeGenerator.cpp
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(547): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(549): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(552): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(553): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(570): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(572): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(594): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(597): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1011486\desktop\cs6610\teapotdata.h(196): warning C4838: conversion from 'double' to 'float' requires a narrowing conversion
+c:\users\u1011486\desktop\cs6610\teapotdata.h(196): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(902): warning C4244: 'initializing': conversion from 'uint' to 'float', possible loss of data
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(954): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(955): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(956): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(970): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(983): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1011486\desktop\cs6610\shapegenerator.cpp(1000): warning C4244: 'initializing': conversion from 'std::streamoff' to 'std::size_t', possible loss of data
   Project2_Utsav.vcxproj -> C:\Users\u1011486\Desktop\cs6610\Debug\Project2_Utsav.exe
   Project2_Utsav.vcxproj -> C:\Users\u1011486\Desktop\cs6610\Debug\Project2_Utsav.pdb (Partial PDB)
